@@ -1,16 +1,19 @@
+import { Link } from "react-router-dom";
+import StyledHeader from "./HeaderStyled";
+
 export const Header = () => {
   return (
-    <header>
+    <StyledHeader>
       <nav>
         <ul>
           <li>
-            <a href="">Home</a>
+            <Link to="/">Home</Link>
           </li>
           <li>
-            <a href="">Movies</a>
+            <Link to="/movies">Movies</Link>
           </li>
         </ul>
       </nav>
-    </header>
+    </StyledHeader>
   );
 };
