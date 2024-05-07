@@ -1,3 +1,3 @@
 export const ApiMovieSection = () => {
-  return <h1>Movie section</h1>;
+  return <input type="text" />;
 };

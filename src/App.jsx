@@ -7,6 +7,7 @@ import { Header } from "./components/HeaderComp/Header";
 function App() {
   return (
     <Router basename="/goit-react-hw-05-movies">
+      {/* basename="/goit-react-hw-05-movies" */}
       <Header />
       <Routes>
         <Route path="/" element={<ApiSection />} />
