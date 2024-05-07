@@ -1,34 +1,55 @@
+import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { ListContent } from "../ListContent/ListContent";
 import { SectionText } from "../SectionText/Sectiontext";
 
-export const ApiSection = () => {
-  const API_KEY = "b66d75e8f7862c194f0cbd7322865cc6";
+export const ApiSection = ({ apiKey }) => {
   const [trendingMovies, setTrendingMovies] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchTrendingMovies = async () => {
+      setIsLoading(true);
       try {
         const response = await fetch(
-          `https://api.themoviedb.org/3/trending/all/day?api_key=${API_KEY}`
+          `https://api.themoviedb.org/3/trending/all/day?api_key=${apiKey}`
         );
-        if (response.ok) {
-          const data = await response.json();
-          setTrendingMovies(data.results);
-        } else {
-          console.error("Failed to fetch trending movies");
+        if (!response.ok) {
+          throw new Error("Failed to fetch trending movies");
         }
+        const data = await response.json();
+        setTrendingMovies(data.results);
       } catch (error) {
-        console.error("Error fetching trending movies:", error);
+        setError(error.message);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchTrendingMovies();
-  }, []);
+  }, [apiKey]);
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
+
   return (
     <>
       <SectionText text="Trending today" />
-      <ListContent movies={trendingMovies} />
+      {trendingMovies.length > 0 ? (
+        <ListContent movies={trendingMovies} />
+      ) : (
+        <p>No trending movies available</p>
+      )}
     </>
   );
+};
+
+ApiSection.propTypes = {
+  apiKey: PropTypes.string.isRequired,
 };
