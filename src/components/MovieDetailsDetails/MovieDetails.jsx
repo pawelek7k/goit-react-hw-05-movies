@@ -1,12 +1,16 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Cast } from "../Cast/Cast";
+import { Reviews } from "../Reviews/Reviews";
 import { SectionText } from "../SectionText/Sectiontext";
 
 export const MovieDetails = ({ apiKey }) => {
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showCast, setShowCast] = useState(false);
+  const [showReviews, setShowReviews] = useState(false);
   const { movieId } = useParams();
 
   useEffect(() => {
@@ -60,6 +64,12 @@ export const MovieDetails = ({ apiKey }) => {
       </div>
       <div>
         <SectionText text="Additional Information" />
+        <button onClick={() => setShowCast(!showCast)}>Toggle Cast</button>
+        {showCast && <Cast apiKey={apiKey} movieId={movieId} />}
+        <button onClick={() => setShowReviews(!showReviews)}>
+          Toggle Reviews
+        </button>
+        {showReviews && <Reviews apiKey={apiKey} movieId={movieId} />}
       </div>
     </>
   );
