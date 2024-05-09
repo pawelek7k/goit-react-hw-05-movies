@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 export const ItemContent = ({ movie }) => {
   return (
     <li>
-      <Link to={`/movies/${movie.id}`}>{movie.title}</Link>
+      <Link to={`/movies/${movie.id}`}>{movie.title ?? movie.name}</Link>
     </li>
   );
 };

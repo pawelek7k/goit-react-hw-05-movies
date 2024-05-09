@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
-import { BackLink } from "../BackLink/BackLink";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Cast } from "../Cast/Cast";
 import { Reviews } from "../Reviews/Reviews";
 import { SectionText } from "../SectionText/Sectiontext";
@@ -12,10 +11,8 @@ export const MovieDetails = ({ apiKey }) => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showCast, setShowCast] = useState(false);
-  const [showReviews, setShowReviews] = useState(false);
-  const { movieId } = useParams();
-  const location = useLocation();
+  const { movieId, tab } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
@@ -70,27 +67,6 @@ export const MovieDetails = ({ apiKey }) => {
     fetchReviews();
   }, [apiKey, movieId]);
 
-  const toggleCast = () => {
-    setShowCast(!showCast);
-    if (!showCast) {
-      setShowReviews(false);
-    }
-    const urlSearchParams = new URLSearchParams(location.search);
-    urlSearchParams.set("tab", "cast");
-    window.history.replaceState(
-      {},
-      "",
-      `${location.pathname}?${urlSearchParams.toString()}`
-    );
-  };
-
-  const toggleReviews = () => {
-    setShowReviews(!showReviews);
-    if (!showReviews) {
-      setShowCast(false);
-    }
-  };
-
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -102,9 +78,7 @@ export const MovieDetails = ({ apiKey }) => {
   return (
     <>
       <div>
-        <BackLink to={location.state?.from ?? "/movies"}>
-          Back to products
-        </BackLink>
+        <button onClick={() => navigate(-1)}>go back</button>
         <SectionText text={movie.title} />
         {movie.backdrop_path && (
           <img
@@ -124,18 +98,14 @@ export const MovieDetails = ({ apiKey }) => {
       </div>
       <div>
         <SectionText text="Additional Information" />
-        <button onClick={toggleCast}>Toggle Cast</button>
-        {showCast && <Cast cast={cast} />}
-        <button onClick={toggleReviews}>Toggle Reviews</button>
-        {showReviews && (
-          <Reviews
-            reviews={
-              reviews.length > 0
-                ? reviews
-                : [{ content: "No reviews available." }]
-            }
-          />
-        )}
+        <Link to={`/movies/${movieId}/${tab === "cast" ? "" : "cast"}`}>
+          Toggle Cast
+        </Link>
+        {tab === "cast" && <Cast cast={cast} />}
+        <Link to={`/movies/${movieId}/${tab === "reviews" ? "" : "reviews"}`}>
+          Toggle Reviews
+        </Link>
+        {tab === "reviews" && <Reviews reviews={reviews} />}
       </div>
     </>
   );

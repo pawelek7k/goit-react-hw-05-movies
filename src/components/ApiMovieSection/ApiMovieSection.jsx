@@ -1,18 +1,22 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import {
+  createSearchParams,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import { ListContent } from "../ListContent/ListContent";
-
 export const ApiMovieSection = ({ apiKey }) => {
   const [searchText, setSearchText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [movies, setMovies] = useState([]);
+  let [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
     const query = searchParams.get("query");
     if (query) {
       setSearchText(query);
@@ -46,8 +50,11 @@ export const ApiMovieSection = ({ apiKey }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    navigate(`?query=${searchText}`);
-    getSearches(searchText);
+    let params = { query: searchText };
+    setSearchParams(params);
+    navigate({
+      search: `?${createSearchParams(params)}`,
+    });
   };
 
   return (
