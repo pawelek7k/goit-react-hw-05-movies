@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { Cast } from "../Cast/Cast";
 import { Reviews } from "../Reviews/Reviews";
 import { SectionText } from "../SectionText/Sectiontext";
@@ -8,6 +8,7 @@ import { SectionText } from "../SectionText/Sectiontext";
 export const MovieDetails = ({ apiKey }) => {
   const [movie, setMovie] = useState(null);
   const [cast, setCast] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showCast, setShowCast] = useState(false);
@@ -48,8 +49,24 @@ export const MovieDetails = ({ apiKey }) => {
       }
     };
 
+    const fetchReviews = async () => {
+      try {
+        const response = await fetch(
+          `https://api.themoviedb.org/3/movie/${movieId}/reviews?api_key=${apiKey}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch reviews");
+        }
+        const data = await response.json();
+        setReviews(data.results);
+      } catch (error) {
+        console.error("Failed to fetch reviews:", error);
+      }
+    };
+
     fetchMovieDetails();
     fetchCast();
+    fetchReviews();
   }, [apiKey, movieId]);
 
   const toggleCast = () => {
@@ -106,7 +123,15 @@ export const MovieDetails = ({ apiKey }) => {
         <button onClick={toggleCast}>Toggle Cast</button>
         {showCast && <Cast cast={cast} />}
         <button onClick={toggleReviews}>Toggle Reviews</button>
-        {showReviews && <Reviews apiKey={apiKey} movieId={movieId} />}
+        {showReviews && (
+          <Reviews
+            reviews={
+              reviews.length > 0
+                ? reviews
+                : [{ content: "No reviews available." }]
+            }
+          />
+        )}
       </div>
     </>
   );
