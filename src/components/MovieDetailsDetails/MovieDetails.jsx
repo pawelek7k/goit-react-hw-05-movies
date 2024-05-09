@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
+import { BackLink } from "../BackLink/BackLink";
 import { Cast } from "../Cast/Cast";
 import { Reviews } from "../Reviews/Reviews";
 import { SectionText } from "../SectionText/Sectiontext";
@@ -101,6 +102,9 @@ export const MovieDetails = ({ apiKey }) => {
   return (
     <>
       <div>
+        <BackLink to={location.state?.from ?? "/movies"}>
+          Back to products
+        </BackLink>
         <SectionText text={movie.title} />
         {movie.backdrop_path && (
           <img
