@@ -1,17 +1,19 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { Cast } from "../Cast/Cast";
 import { Reviews } from "../Reviews/Reviews";
 import { SectionText } from "../SectionText/Sectiontext";
 
 export const MovieDetails = ({ apiKey }) => {
   const [movie, setMovie] = useState(null);
+  const [cast, setCast] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showCast, setShowCast] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const { movieId } = useParams();
+  const location = useLocation();
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
@@ -31,8 +33,45 @@ export const MovieDetails = ({ apiKey }) => {
       }
     };
 
+    const fetchCast = async () => {
+      try {
+        const response = await fetch(
+          `https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${apiKey}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch cast details");
+        }
+        const data = await response.json();
+        setCast(data.cast);
+      } catch (error) {
+        console.error("Failed to fetch cast details:", error);
+      }
+    };
+
     fetchMovieDetails();
+    fetchCast();
   }, [apiKey, movieId]);
+
+  const toggleCast = () => {
+    setShowCast(!showCast);
+    if (!showCast) {
+      setShowReviews(false);
+    }
+    const urlSearchParams = new URLSearchParams(location.search);
+    urlSearchParams.set("tab", "cast");
+    window.history.replaceState(
+      {},
+      "",
+      `${location.pathname}?${urlSearchParams.toString()}`
+    );
+  };
+
+  const toggleReviews = () => {
+    setShowReviews(!showReviews);
+    if (!showReviews) {
+      setShowCast(false);
+    }
+  };
 
   if (loading) {
     return <p>Loading...</p>;
@@ -64,11 +103,9 @@ export const MovieDetails = ({ apiKey }) => {
       </div>
       <div>
         <SectionText text="Additional Information" />
-        <button onClick={() => setShowCast(!showCast)}>Toggle Cast</button>
-        {showCast && <Cast apiKey={apiKey} movieId={movieId} />}
-        <button onClick={() => setShowReviews(!showReviews)}>
-          Toggle Reviews
-        </button>
+        <button onClick={toggleCast}>Toggle Cast</button>
+        {showCast && <Cast cast={cast} />}
+        <button onClick={toggleReviews}>Toggle Reviews</button>
         {showReviews && <Reviews apiKey={apiKey} movieId={movieId} />}
       </div>
     </>
