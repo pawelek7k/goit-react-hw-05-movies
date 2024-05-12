@@ -8,7 +8,7 @@ import { MovieDetails } from "~/components/MovieDetailsDetails/MovieDetails";
 export const Router = () => {
   const API_KEY = "b66d75e8f7862c194f0cbd7322865cc6";
   return (
-    <BrowserRouter basename="/goit-react-hw-05-movies">
+    <BrowserRouter>
       {/* basename="/goit-react-hw-05-movies" */}
       <Header />
       <Routes>

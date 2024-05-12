@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Cast } from "../Cast/Cast";
 import { Reviews } from "../Reviews/Reviews";
 import { SectionText } from "../SectionText/Sectiontext";
@@ -13,7 +13,7 @@ export const MovieDetails = ({ apiKey }) => {
   const [error, setError] = useState(null);
   const { movieId, tab } = useParams();
   const navigate = useNavigate();
-
+  const location = useLocation();
   useEffect(() => {
     const fetchMovieDetails = async () => {
       try {
@@ -75,10 +75,17 @@ export const MovieDetails = ({ apiKey }) => {
     return <p>Error: {error}</p>;
   }
 
+  const referrerFunc = () => {
+    console.log(document.referrer, window.location.origin);
+    return document.referrer.includes(window.location.origin)
+      ? navigate(-1)
+      : navigate("/movies");
+  };
+
   return (
     <>
       <div>
-        <button onClick={() => navigate(-1)}>go back</button>
+        <button onClick={referrerFunc}>go back</button>
         <SectionText text={movie.title} />
         {movie.backdrop_path && (
           <img
@@ -99,11 +106,11 @@ export const MovieDetails = ({ apiKey }) => {
       <div>
         <SectionText text="Additional Information" />
         <Link to={`/movies/${movieId}/${tab === "cast" ? "" : "cast"}`}>
-          Toggle Cast
+          Cast <br />
         </Link>
         {tab === "cast" && <Cast cast={cast} />}
         <Link to={`/movies/${movieId}/${tab === "reviews" ? "" : "reviews"}`}>
-          Toggle Reviews
+          Reviews
         </Link>
         {tab === "reviews" && <Reviews reviews={reviews} />}
       </div>
